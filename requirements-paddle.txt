@@ -1,0 +1,6 @@
+# Install inside the PaddlePaddle CUDA container or a CUDA-compatible environment.
+# Paddle/PaddleFormers versions move quickly; prefer the versions documented by PaddleFormers for PaddleOCR-VL.
+paddleocr[doc-parser]
+opencv-python-headless
+visualdl
+python-Levenshtein

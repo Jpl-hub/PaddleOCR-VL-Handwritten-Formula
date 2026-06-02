@@ -1,0 +1,2 @@
+{"prediction": "\\[x+1=2\\]", "ground_truth": "\\[x+1=2\\]", "image": "images/test/sample_1.png"}
+{"prediction": "\\[\\frac{a}{b}\\]", "ground_truth": "\\[\\frac{a}{b}\\]", "image": "images/test/sample_2.png"}

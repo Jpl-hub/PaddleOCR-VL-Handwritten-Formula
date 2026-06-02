@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Large artifacts
+data/
+models/
+outputs/
+checkpoints/
+*.safetensors
+*.pdparams
+*.pdopt
+*.pdmodel
+*.tar
+*.zip
+
+# Logs
+*.log
+visualdl_logs/
+tensorboard_logs/
+
+# Local environment
+.env
+.DS_Store

@@ -1,0 +1,11 @@
+### model
+model_name_or_path: PaddlePaddle/PaddleOCR-VL
+_attn_implementation: flashmask
+lora: true
+lora_rank: 16
+copy_custom_file_list: "configuration_paddleocr_vl.py image_processing_paddleocr_vl.py modeling_paddleocr_vl.py processing_paddleocr_vl.py inference.yml"
+
+### export
+output_dir: ./outputs/paddleocr_vl_formula_lora
+export_model_dir: ./outputs/paddleocr_vl_formula_lora/export
+save_to_hf: true

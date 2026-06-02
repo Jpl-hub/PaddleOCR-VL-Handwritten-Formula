@@ -1,0 +1,2 @@
+{"messages": [{"role": "user", "content": "<image>Formula Recognition:"}, {"role": "assistant", "content": "\\[x+1=2\\]"}], "images": ["images/test/sample_1.png"], "meta": {"difficulty": "easy"}}
+{"messages": [{"role": "user", "content": "<image>Formula Recognition:"}, {"role": "assistant", "content": "\\[\\frac{a}{b}\\]"}], "images": ["images/test/sample_2.png"], "meta": {"difficulty": "easy"}}
