@@ -6,9 +6,21 @@ cd "$ROOT_DIR"
 
 FIXTURE_DIR=${FIXTURE_DIR:-tests/fixtures/tiny_formula}
 REPORT_DIR=${REPORT_DIR:-outputs/tiny_report}
+if [ -z "${PYTHON:-}" ]; then
+  if command -v python3 >/dev/null 2>&1; then
+    PYTHON=python3
+  elif command -v python >/dev/null 2>&1; then
+    PYTHON=python
+  elif [ -x /root/miniconda3/bin/python ]; then
+    PYTHON=/root/miniconda3/bin/python
+  else
+    echo "No Python executable found. Set PYTHON=/path/to/python." >&2
+    exit 1
+  fi
+fi
 
-python3 -m compileall scripts demo
+"$PYTHON" -m compileall scripts demo
 rm -rf "$FIXTURE_DIR" "$REPORT_DIR"
-python3 scripts/create_tiny_fixture.py --output-dir "$FIXTURE_DIR"
-python3 scripts/analyze_dataset.py --input "$FIXTURE_DIR/test.jsonl" --output-dir "$REPORT_DIR"
-python3 scripts/evaluate_formula.py --predictions "$FIXTURE_DIR/predictions.jsonl"
+"$PYTHON" scripts/create_tiny_fixture.py --output-dir "$FIXTURE_DIR"
+"$PYTHON" scripts/analyze_dataset.py --input "$FIXTURE_DIR/test.jsonl" --output-dir "$REPORT_DIR"
+"$PYTHON" scripts/evaluate_formula.py --predictions "$FIXTURE_DIR/predictions.jsonl"
