@@ -8,6 +8,7 @@ import re
 import time
 import urllib.parse
 import urllib.request
+from urllib.error import URLError
 from pathlib import Path
 from typing import Any
 
@@ -45,19 +46,41 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--no-wrap-display", action="store_true")
     parser.add_argument("--timeout", type=int, default=30)
     parser.add_argument("--sleep", type=float, default=0.0)
+    parser.add_argument("--retries", type=int, default=5)
     return parser.parse_args()
 
 
-def urlopen_json(url: str, timeout: int) -> dict[str, Any]:
-    req = urllib.request.Request(url, headers={"User-Agent": "formula-dataset-prep"})
-    with urllib.request.urlopen(req, timeout=timeout) as response:
-        return json.load(response)
+def retry_request(fn, retries: int, sleep: float):
+    last_error: Exception | None = None
+    for attempt in range(retries + 1):
+        try:
+            return fn()
+        except (TimeoutError, URLError, OSError) as exc:
+            last_error = exc
+            if attempt >= retries:
+                break
+            time.sleep(max(sleep, 0.5) * (2**attempt))
+    raise last_error if last_error else RuntimeError("request failed")
 
 
-def download_bytes(url: str, timeout: int) -> bytes:
+def urlopen_json(url: str, timeout: int, retries: int, sleep: float) -> dict[str, Any]:
     req = urllib.request.Request(url, headers={"User-Agent": "formula-dataset-prep"})
-    with urllib.request.urlopen(req, timeout=timeout) as response:
-        return response.read()
+
+    def read_json():
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            return json.load(response)
+
+    return retry_request(read_json, retries, sleep)
+
+
+def download_bytes(url: str, timeout: int, retries: int, sleep: float) -> bytes:
+    req = urllib.request.Request(url, headers={"User-Agent": "formula-dataset-prep"})
+
+    def read_bytes():
+        with urllib.request.urlopen(req, timeout=timeout) as response:
+            return response.read()
+
+    return retry_request(read_bytes, retries, sleep)
 
 
 def rows_url(dataset: str, config: str, split: str, offset: int, length: int) -> str:
@@ -90,12 +113,22 @@ def find_field(row: dict[str, Any], kind: str) -> str:
     raise ValueError(f"Could not find {kind} field in row keys: {sorted(row)}")
 
 
-def fetch_rows(dataset: str, config: str, split: str, offset: int, size: int, page_size: int, timeout: int, sleep: float):
+def fetch_rows(
+    dataset: str,
+    config: str,
+    split: str,
+    offset: int,
+    size: int,
+    page_size: int,
+    timeout: int,
+    sleep: float,
+    retries: int,
+):
     remaining = size
     current_offset = offset
     while remaining > 0:
         length = min(page_size, remaining)
-        payload = urlopen_json(rows_url(dataset, config, split, current_offset, length), timeout)
+        payload = urlopen_json(rows_url(dataset, config, split, current_offset, length), timeout, retries, sleep)
         rows = payload.get("rows", [])
         if not rows:
             break
@@ -124,6 +157,7 @@ def convert_split(
     page_size: int,
     timeout: int,
     sleep: float,
+    retries: int,
 ) -> dict[str, Any]:
     images_dir = output_dir / "images" / output_split
     images_dir.mkdir(parents=True, exist_ok=True)
@@ -132,7 +166,7 @@ def convert_split(
     difficulty = {"easy": 0, "medium": 0, "hard": 0}
     written = 0
 
-    iterator = fetch_rows(dataset, config, source_split, offset, size, page_size, timeout, sleep)
+    iterator = fetch_rows(dataset, config, source_split, offset, size, page_size, timeout, sleep, retries)
     with jsonl_path.open("w", encoding="utf-8") as data_out, manifest_path.open("w", encoding="utf-8") as manifest_out:
         for row_item in tqdm(iterator, total=size, desc=f"download {output_split}"):
             row = row_item["row"]
@@ -152,7 +186,7 @@ def convert_split(
             sample_id = safe_name(row.get(id_field) if id_field else row_item.get("row_idx"), f"{output_split}_{written:08d}")
             image_rel = Path("images") / output_split / f"{written + 1:08d}_{sample_id}.{image_format}"
             image_path = output_dir / image_rel
-            image_path.write_bytes(download_bytes(image_value["src"], timeout))
+            image_path.write_bytes(download_bytes(image_value["src"], timeout, retries, sleep))
 
             label = wrap_display_math(latex) if wrap_labels else latex
             bucket = difficulty_bucket(label)
@@ -229,6 +263,7 @@ def main() -> None:
                 args.page_size,
                 args.timeout,
                 args.sleep,
+                args.retries,
             )
         )
     test_path = output_dir / "test.jsonl"
