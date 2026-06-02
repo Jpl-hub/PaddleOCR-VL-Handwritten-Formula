@@ -20,6 +20,17 @@ Preferred approach:
 3. Keep the project in `/root/PaddleOCR-VL-Handwritten-Formula`.
 4. Keep model cache and dataset cache inside the project or a documented cache directory.
 
+Verified server environment:
+
+- Conda env: `/root/miniconda3/envs/formula_vl`
+- PaddlePaddle GPU: `3.2.1`, CUDA-enabled.
+- PaddleFormers: `1.0.0`; `1.1.1` was not compatible with Paddle `3.2.1` because it imports `paddle.distributed.fsdp`.
+- Required shell setup before running PaddleFormers CLI:
+
+```bash
+export PATH=/root/miniconda3/envs/formula_vl/bin:$PATH
+```
+
 ## Baseline Training
 
 Config:

@@ -113,9 +113,23 @@ python scripts/analyze_dataset.py \
   --output-dir outputs/hme100k_eval_report
 ```
 
+Low-bandwidth subset preparation through the Hugging Face Dataset Viewer API:
+
+```bash
+python scripts/prepare_hf_rows_formula_dataset.py \
+  --dataset deepcopy/MathWriting-human \
+  --output-dir data/mathwriting_rows_smoke \
+  --train-size 1000 \
+  --val-size 100 \
+  --test-size 100
+```
+
+This route downloads only the selected rows and image assets. It is useful when a server cannot reach Hugging Face directly or does not have enough disk for full dataset caches.
+
 ## Current Status
 
 - Public baseline pipeline: implemented.
+- Low-bandwidth Dataset Viewer pipeline: implemented.
 - Real evaluation-set collection: pending sample acquisition.
 - Manual label audit: pending real evaluation split.
 - Final hosted dataset link: pending.

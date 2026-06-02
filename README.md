@@ -19,7 +19,6 @@ demo/                    Local Gradio demo
 docs/                    Dataset, annotation, training, and submission docs
 hf_model_card/           Hugging Face model-card draft
 scripts/                 Data preparation, analysis, training, and evaluation utilities
-tests/fixtures/          Tiny smoke-test fixtures
 ```
 
 Large data and model artifacts are intentionally excluded from Git. Use `data/`, `outputs/`, and `models/` locally or on the training server.
@@ -35,9 +34,7 @@ python -m pip install -r requirements.txt
 Create a tiny fixture and run the local checks:
 
 ```bash
-python scripts/create_tiny_fixture.py --output-dir tests/fixtures/tiny_formula
-python scripts/analyze_dataset.py --input tests/fixtures/tiny_formula/test.jsonl --output-dir outputs/tiny_report
-python scripts/evaluate_formula.py --predictions tests/fixtures/tiny_formula/predictions.jsonl
+bash scripts/run_smoke_test.sh
 ```
 
 Prepare a public-data baseline in PaddleOCR-VL message format:
@@ -64,6 +61,18 @@ python scripts/prepare_hf_formula_dataset.py \
   --test-size 2000 \
   --prompt "Formula Recognition:" \
   --seed 2026
+```
+
+If the training machine cannot reach Hugging Face Hub, use the Dataset Viewer API from a machine with access and upload the generated package:
+
+```bash
+python scripts/prepare_hf_rows_formula_dataset.py \
+  --dataset deepcopy/MathWriting-human \
+  --output-dir data/mathwriting_rows_smoke \
+  --train-size 1000 \
+  --val-size 100 \
+  --test-size 100 \
+  --prompt "Formula Recognition:"
 ```
 
 Generate a dataset quality report:

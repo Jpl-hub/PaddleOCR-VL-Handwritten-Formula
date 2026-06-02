@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT_DIR"
 
-FIXTURE_DIR=${FIXTURE_DIR:-tests/fixtures/tiny_formula}
+FIXTURE_DIR=${FIXTURE_DIR:-outputs/tiny_formula_fixture}
 REPORT_DIR=${REPORT_DIR:-outputs/tiny_report}
 if [ -z "${PYTHON:-}" ]; then
   if command -v python3 >/dev/null 2>&1; then
