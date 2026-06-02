@@ -122,6 +122,28 @@ MODEL_PATH=outputs/paddleocr_vl_formula_lora/export gradio demo/app.py
 
 Open the printed local URL, upload a formula image, and run greedy LaTeX generation.
 
+## Evaluation Set Collection
+
+Run the local annotation app:
+
+```bash
+ANNOTATION_DATASET_DIR=data/real_formula_collection gradio demo/annotate_formula_dataset.py
+```
+
+Validate, analyze, and package a private evaluation set:
+
+```bash
+python scripts/validate_formula_dataset.py --input data/real_formula_collection/eval.jsonl --require-meta
+python scripts/analyze_dataset.py --input data/real_formula_collection/eval.jsonl --output-dir outputs/real_formula_eval_report
+python scripts/package_evaluation_set.py \
+  --annotations data/real_formula_collection/eval.jsonl \
+  --output-dir outputs/submission \
+  --name handwritten_formula_eval \
+  --analysis-report outputs/real_formula_eval_report/dataset_analysis.md
+```
+
+See [docs/REAL_EVAL_COLLECTION_PLAYBOOK.md](docs/REAL_EVAL_COLLECTION_PLAYBOOK.md).
+
 ## Submission Checklist
 
 Before each leaderboard email:

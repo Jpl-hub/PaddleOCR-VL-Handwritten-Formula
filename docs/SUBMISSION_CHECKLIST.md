@@ -59,3 +59,5 @@ The sign-up comment should use this exact bracket style:
 【选题方向】：手写公式识别 / Handwritten Formula Recognition
 【团队人数】：1
 ```
+
+The current registration should be checked on the issue page. If it uses `〖报名〗`, edit it to the exact `【报名】` format above so the tracking bot can parse it.
