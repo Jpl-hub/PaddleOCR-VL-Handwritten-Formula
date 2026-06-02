@@ -26,6 +26,7 @@ checkpoints/
 *.log
 visualdl_logs/
 tensorboard_logs/
+paddleformers_dist_log/
 
 # Local environment
 .env
